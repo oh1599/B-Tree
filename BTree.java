@@ -33,9 +33,19 @@ public class BTree
 	{
 		int mid = node.numKey/2;
 		Node n = new Node();
-		for(int i=mid;i<node.numKey;i++)
+		if(node.numKey%2 == 1)
 		{
-			n.data[i+mid] = node.data[i+mid];
+			for(int i=0;i<mid;i++)
+			{
+				n.data[n.numKey++] = node.data[i+mid+1];
+			}
+		}
+		else
+		{
+			for(int i=0;i<mid;i++)
+			{
+				n.data[n.numKey++] = node.data[i+mid];
+			}
 		}
 		return n;
 	}
@@ -107,32 +117,29 @@ public class BTree
 			x = x.child[i];
 		}while(x!=null);//stack에 leaf노드까지의 모든 노드 저장
 
-		boolean finished = false;
+		boolean finished = false;//삽입의 끝을 결정하는 flag 변수
 		do
 		{
 			x = stack.peek();
 			if(x.numKey<m-1)	//overflow 발생 안함 -> 리프 노드에 삽입
 			{
-
-				if(x.isLeafNode())
-				{
-					x.insertKey(newKey);
-					finished = true;
-					sortData(x);
-				}
+				x.insertKey(newKey);
+				finished = true;
+				sortData(x);
+				
 			}
-			else	//overflow 발생 했음 ->
+			else	//overflow 발생 했음 -> split
 			{
 				temp = x;
 				
 				temp.insertKey(newKey);
 				sortData(temp);
 				
-				newKey = temp.getMidValue();
+				newKey = temp.getMidValue(); //가운데 값을 새로운 키 값으로 설정
 				
-				x = firstHalf(temp);
-				y = secondHalf(temp);
-				
+				//노드를 가운데를 기준으로 앞 뒤로 분할
+				x = firstHalf(temp);//앞 부분
+				y = secondHalf(temp);//뒷 부분
 			}
 			if(!stack.empty())
 			{
